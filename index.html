@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DSG MVNE × Econet Wireless Zimbabwe — Launch and scale MVNOs on Zimbabwe's leading network</title>
+<meta name="robots" content="noindex, nofollow" />
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --bg:#080b12;
+  --bg2:#0b1018;
+  --ink:#f4f7fb;
+  --muted:rgba(244,247,251,.62);
+  --muted2:rgba(244,247,251,.40);
+  --primary:#38bdf8;
+  --primary-deep:#0ea5e9;
+  --primary-soft:rgba(56,189,248,.10);
+  --primary-line:rgba(56,189,248,.40);
+  --card:rgba(255,255,255,.04);
+  --card-strong:rgba(255,255,255,.06);
+  --border:rgba(255,255,255,.10);
+  --border-soft:rgba(255,255,255,.07);
+  --mono:'Geist Mono','IBM Plex Mono',ui-monospace,monospace;
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;
+  line-height:1.5;
+  overflow-x:hidden;
+}
+
+/* ===== Ambient backdrop ===== */
+body::before{
+  content:"";position:fixed;inset:0;z-index:-2;
+  background:
+    radial-gradient(1100px 700px at 78% -8%, rgba(56,189,248,.16), transparent 60%),
+    radial-gradient(900px 600px at 8% 12%, rgba(14,165,233,.10), transparent 55%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:-1;opacity:.35;
+  background-image:radial-gradient(rgba(255,255,255,.10) 1px, transparent 1px);
+  background-size:34px 34px;
+  -webkit-mask-image:radial-gradient(circle at 50% 30%, #000 0%, transparent 75%);
+  mask-image:radial-gradient(circle at 50% 30%, #000 0%, transparent 75%);
+}
+
+/* ===== Fixed chrome ===== */
+.scroll-progress{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--primary),var(--primary-deep));z-index:100;transition:width .15s ease;}
+.side-nav{position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:90;display:flex;flex-direction:column;gap:14px;}
+.side-nav a{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.22);transition:all .25s;display:block;}
+.side-nav a:hover{background:var(--primary);transform:scale(1.3);}
+.side-nav a.active{background:var(--primary);box-shadow:0 0 0 4px var(--primary-soft);}
+.present-toggle{position:fixed;bottom:22px;right:22px;z-index:90;background:var(--card-strong);color:var(--ink);border:1px solid var(--border);border-radius:999px;padding:9px 18px;font-family:var(--sans);font-size:.8rem;font-weight:600;cursor:pointer;backdrop-filter:blur(10px);transition:all .2s;}
+.present-toggle:hover{border-color:var(--primary-line);color:var(--primary);}
+.present-controls{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);z-index:120;display:flex;align-items:center;gap:14px;background:rgba(12,17,26,.92);border:1px solid var(--border);border-radius:999px;padding:10px 16px;backdrop-filter:blur(14px);opacity:0;pointer-events:none;transition:all .3s;}
+.present-controls.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);}
+.present-controls button{background:none;border:none;color:var(--ink);font-family:var(--sans);font-size:.85rem;font-weight:600;cursor:pointer;padding:6px 12px;border-radius:999px;transition:background .2s;}
+.present-controls button:hover{background:rgba(255,255,255,.08);}
+.present-controls #presentCounter{font-family:var(--mono);font-size:.78rem;color:var(--muted);min-width:54px;text-align:center;}
+.nav-hint{position:fixed;bottom:24px;left:24px;z-index:90;font-family:var(--mono);font-size:.72rem;color:var(--muted2);opacity:0;transition:opacity .4s;}
+.nav-hint.visible{opacity:1;}
+
+/* ===== Slides ===== */
+.slide,.hero{position:relative;min-height:100vh;width:100%;display:flex;flex-direction:column;justify-content:center;padding:88px 64px;border-top:1px solid var(--border-soft);}
+.hero{border-top:none;}
+.slide-inner{width:100%;max-width:1140px;margin:0 auto;}
+
+/* present mode */
+body.present .scroll-progress,
+body.present .side-nav,
+body.present .present-toggle,
+body.present .nav-hint{display:none;}
+body.present [data-slide]{position:fixed;inset:0;opacity:0;pointer-events:none;transition:opacity .45s ease;overflow-y:auto;}
+body.present [data-slide].is-current{opacity:1;pointer-events:auto;}
+
+/* ===== Typography & components ===== */
+h1,h2,h3,h4{font-weight:800;letter-spacing:-.02em;line-height:1.05;}
+.eyebrow{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:.72rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border:1px solid var(--border);background:var(--card);border-radius:999px;padding:6px 14px;backdrop-filter:blur(8px);}
+.eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--primary);box-shadow:0 0 12px var(--primary);}
+.kicker{font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--primary);}
+.slide-num{display:inline-block;font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2);margin-bottom:18px;}
+.rule{height:4px;width:56px;border-radius:4px;background:var(--primary);margin:18px 0 0;}
+.lead{font-size:1.2rem;line-height:1.6;color:var(--muted);max-width:62ch;}
+h2.title{font-size:clamp(2.2rem,4.4vw,3.6rem);}
+h3.sub{font-size:clamp(1.4rem,2.4vw,2rem);font-weight:700;}
+.text-primary{color:var(--primary);}
+.muted{color:var(--muted);}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:26px;transition:border-color .25s,transform .25s,background .25s;}
+.card:hover{border-color:var(--primary-line);transform:translateY(-3px);background:var(--card-strong);}
+.card.hot{border-color:var(--primary-line);background:var(--primary-soft);box-shadow:0 0 60px -22px var(--primary);}
+.grid{display:grid;gap:18px;}
+.g2{grid-template-columns:repeat(2,1fr);}
+.g3{grid-template-columns:repeat(3,1fr);}
+.g4{grid-template-columns:repeat(4,1fr);}
+@media(max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr;}.slide,.hero{padding:72px 28px;}}
+
+.num-badge{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;border:1px solid var(--primary-line);background:var(--primary-soft);font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--primary);flex-shrink:0;}
+.stat-num{font-size:clamp(1.7rem,2.6vw,2.1rem);font-weight:900;color:var(--primary);line-height:1;}
+.big-num{font-size:clamp(3rem,8vw,6rem);font-weight:900;color:var(--primary);line-height:.95;letter-spacing:-.03em;}
+.chk{color:var(--primary);flex-shrink:0;}
+.tag{display:inline-flex;align-items:center;border:1px solid var(--border);background:rgba(255,255,255,.03);border-radius:999px;padding:5px 14px;font-size:.82rem;color:var(--muted);}
+ul.ticks{list-style:none;display:flex;flex-direction:column;gap:11px;}
+ul.ticks li{display:flex;gap:11px;font-size:.92rem;color:var(--muted);}
+ul.ticks li .chk{margin-top:2px;}
+
+.logo-chip{display:inline-flex;align-items:center;gap:14px;background:#fff;border-radius:14px;padding:12px 20px;}
+.logo-chip img{height:30px;width:auto;display:block;}
+.logo-chip .divider{width:1px;height:26px;background:#d4d4d8;}
+.logo-wm{height:30px;width:auto;opacity:.92;}
+
+.role-card{border-radius:16px;border:1px solid var(--border);padding:24px;background:rgba(255,255,255,.03);}
+.role-card .role-name{font-size:1.5rem;font-weight:800;}
+
+.eq{display:flex;flex-wrap:wrap;align-items:center;gap:14px;font-size:clamp(1.2rem,2.4vw,1.8rem);font-weight:800;}
+.eq .op{color:var(--primary);font-weight:600;}
+.eq .term{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 20px;}
+
+footer.deck-foot{font-family:var(--mono);font-size:.74rem;color:var(--muted2);}
+a{color:var(--primary);text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="scroll-progress" id="progress"></div>
+<nav class="side-nav" id="sideNav"></nav>
+<button class="present-toggle" id="presentToggle">Present</button>
+<div class="present-controls" id="presentControls">
+  <button id="prevBtn">◀ Previous</button>
+  <span id="presentCounter">1 / 1</span>
+  <button id="nextBtn">Next ▶</button>
+  <button id="exitBtn">✕ Exit</button>
+</div>
+<div class="nav-hint" id="navHint">← → to move · F to present</div>
+
+<section class="hero" data-slide="Cover">
+  <div class="slide-inner">
+    <div class="logo-chip">
+      <img src="dsg-dark.png" alt="DSG" />
+      <span class="divider"></span>
+      <img src="mvne-dark.png" alt="MVNE — Mobile Virtual Network Enabler" />
+    </div>
+    <span class="eyebrow" style="margin-top:26px;"><span class="dot"></span>Prepared for Econet Wireless Zimbabwe · Host MNO partnership</span>
+    <h1 style="margin-top:24px;font-size:clamp(2.6rem,6vw,5rem);max-width:18ch;">Launch and scale an MVNO that competes on value — not price.</h1>
+    <div class="rule"></div>
+    <p class="lead" style="margin-top:28px;">We help brands, retailers and enterprises build profitable mobile businesses across Africa and beyond. Operating model, technology stack, day-to-day operations — handled. On Econet's network, in Zimbabwe.</p>
+    <div class="grid g3" style="margin-top:52px;max-width:760px;">
+      <div class="card"><div class="stat-num">28</div><div style="margin-top:10px;font-weight:600;font-size:.92rem;">Years in market</div><div style="margin-top:4px;font-size:.78rem;color:var(--muted2);">Since 1998</div></div>
+      <div class="card"><div class="stat-num">1000+</div><div style="margin-top:10px;font-weight:600;font-size:.92rem;">CX seats</div><div style="margin-top:4px;font-size:.78rem;color:var(--muted2);">JHB + Cape Town</div></div>
+      <div class="card"><div class="stat-num">300+</div><div style="margin-top:10px;font-weight:600;font-size:.92rem;">Networks</div><div style="margin-top:4px;font-size:.78rem;color:var(--muted2);">200+ countries</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="What is an MVNO">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span>Section 01</span>
+    <h2 class="title" style="margin-top:18px;">What is an MVNO?</h2>
+    <div class="rule"></div>
+    <p class="lead" style="margin-top:24px;">A Mobile Virtual Network Operator (MVNO) is a brand that sells mobile services without owning the underlying radio network. It rides on a host MNO's coverage and competes on brand, customer experience, and the value layered on top of the SIM.</p>
+    <div class="grid g3" style="margin-top:44px;">
+      <div class="role-card">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;">
+          <span class="role-name">MNO</span>
+          <span style="font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);">Mobile Network Operator</span>
+        </div>
+        <p style="margin-top:16px;font-size:.9rem;color:var(--muted);">Owns the towers, spectrum and core network. Provides wholesale capacity. <strong style="color:var(--ink);">In Zimbabwe, that's Econet.</strong></p>
+      </div>
+      <div class="role-card hot" style="position:relative;">
+        <span style="position:absolute;top:-11px;right:22px;border:1px solid var(--primary-line);background:var(--bg);border-radius:999px;padding:2px 11px;font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--primary);">That's us</span>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;">
+          <span class="role-name text-primary">MVNE</span>
+          <span style="font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);">Mobile Virtual Network Enabler</span>
+        </div>
+        <p style="margin-top:16px;font-size:.9rem;color:var(--muted);">Operates the BSS, OCS, provisioning and day-to-day commercial running of the MVNO. This is us.</p>
+      </div>
+      <div class="role-card">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;">
+          <span class="role-name">MVNO</span>
+          <span style="font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);">Mobile Virtual Network Operator</span>
+        </div>
+        <p style="margin-top:16px;font-size:.9rem;color:var(--muted);">Owns the brand, the customer relationship and the go-to-market. The face of the business.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="Why brands launch MVNOs">
+  <div class="slide-inner">
+    <h3 class="sub">Why brands launch MVNOs</h3>
+    <div class="rule"></div>
+    <div class="grid g2" style="margin-top:34px;">
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:12px;"><span class="num-badge">01</span><h4 style="font-size:1.05rem;">Non-comparative proposition</h4></div>
+        <p style="margin-top:14px;font-size:.9rem;color:var(--muted);">Bundle connectivity into your existing brand promise — a price that can't be apples-to-apples compared with an MNO.</p>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:12px;"><span class="num-badge">02</span><h4 style="font-size:1.05rem;">Greater customer entanglement</h4></div>
+        <p style="margin-top:14px;font-size:.9rem;color:var(--muted);">Mobile services touch every day of your customer's life. Loyalty becomes structural, not promotional.</p>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:12px;"><span class="num-badge">03</span><h4 style="font-size:1.05rem;">First-party behavioural data</h4></div>
+        <p style="margin-top:14px;font-size:.9rem;color:var(--muted);">Passively collected usage data feeds personalisation, retention and new revenue lines.</p>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:12px;"><span class="num-badge">04</span><h4 style="font-size:1.05rem;">New high-margin revenue</h4></div>
+        <p style="margin-top:14px;font-size:.9rem;color:var(--muted);">Layered VAS — fintech, security, content, insurance — unlock margins that pure connectivity cannot.</p>
+      </div>
+    </div>
+    <div class="card" style="margin-top:30px;display:flex;flex-wrap:wrap;align-items:center;gap:28px;">
+      <div class="big-num">40%+</div>
+      <div style="flex:1;min-width:280px;">
+        <p style="font-size:1.05rem;">Average MVNO churn without strong CX. The MVNOs that win don't compete on price — they win on relevance.</p>
+        <p style="margin-top:10px;font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2);">MVNO Nation CX Study</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="About DSG">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span>Section 02</span>
+    <h2 class="title" style="margin-top:18px;">About DSG</h2>
+    <div class="rule"></div>
+    <p class="lead" style="margin-top:24px;">DSG is a multi-divisional digital solutions group headquartered in Johannesburg, South Africa — partnering with businesses across Africa to build the connected, digital-first enterprises of tomorrow.</p>
+    <div class="grid g3" style="margin-top:44px;">
+      <div class="card">
+        <h3 style="font-size:1.25rem;font-weight:700;line-height:1.25;">28 years building digital businesses</h3>
+        <p style="margin-top:16px;font-size:.9rem;color:var(--muted);">From launching mobile networks across Africa in the 2000s to operating today's largest South African MVNOs, retail, financial services and CX programmes.</p>
+      </div>
+      <div class="card">
+        <h3 style="font-size:1.25rem;font-weight:700;line-height:1.25;">Pan-African + global footprint</h3>
+        <p style="margin-top:16px;font-size:.9rem;color:var(--muted);">Offices in Johannesburg, Cape Town and the Seychelles. Network coverage in 200+ countries.</p>
+      </div>
+      <div class="card">
+        <h3 style="font-size:1.25rem;font-weight:700;line-height:1.25;">Operator, not consultant</h3>
+        <p style="margin-top:16px;font-size:.9rem;color:var(--muted);">We run real revenue-bearing telco operations every day. Our recommendations are calibrated against what is actually working in the market right now.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="Six divisions">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span>Digital Solutions Group</span>
+    <h3 class="sub" style="margin-top:16px;">Six divisions, one group</h3>
+    <div class="rule"></div>
+    <p class="muted" style="margin-top:18px;max-width:70ch;font-size:.95rem;">MVNE is one part of a wider DSG. The other divisions are how we deliver end-to-end — from CX and creative through to commerce, marketing and security.</p>
+    <div class="grid g3" style="margin-top:34px;">
+      <div class="card">
+        <div class="logo-chip" style="padding:8px 14px;"><img src="mvne-dark.png" alt="MVNE" style="height:24px;"/></div>
+        <p style="margin-top:14px;font-size:.82rem;font-weight:600;color:var(--primary);">Mobile Virtual Network Enabler</p>
+        <p style="margin-top:10px;font-size:.84rem;color:var(--muted);">MVNE powers mobile virtual network operators across Africa, providing the full stack of platform services, ecosystem management, and value-added solutions needed to launch and run a successful MVNO.</p>
+        <ul class="ticks" style="margin-top:14px;font-size:.8rem;">
+          <li><span class="chk">✦</span>MVNO Platform &amp; BSS/OSS</li>
+          <li><span class="chk">✦</span>Travel eSIM &amp; eSIM Management</li>
+          <li><span class="chk">✦</span>Loyalty &amp; Rewards Programs</li>
+          <li><span class="chk">✦</span>Device Financing</li>
+          <li><span class="chk">✦</span>Value-Added Services (VAS)</li>
+          <li><span class="chk">✦</span>Revenue Assurance</li>
+        </ul>
+        <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:12px;font-size:.72rem;color:var(--muted2);">www.mvne.co.za</div>
+      </div>
+      <div class="card">
+        <div class="logo-chip" style="padding:8px 14px;"><img src="cxg-dark.png" alt="CXG" style="height:24px;"/></div>
+        <p style="margin-top:14px;font-size:.82rem;font-weight:600;color:var(--primary);">Customer Experience Group</p>
+        <p style="margin-top:10px;font-size:.84rem;color:var(--muted);">CXG delivers world-class omni-channel customer experience services — combining human expertise with intelligent technology to build lasting customer relationships at every touchpoint.</p>
+        <ul class="ticks" style="margin-top:14px;font-size:.8rem;">
+          <li><span class="chk">✦</span>Omni-channel Contact Centre</li>
+          <li><span class="chk">✦</span>WhatsApp, SMS &amp; Email Support</li>
+          <li><span class="chk">✦</span>Social Media Management</li>
+          <li><span class="chk">✦</span>CRM Implementation</li>
+          <li><span class="chk">✦</span>Business Intelligence &amp; Reporting</li>
+          <li><span class="chk">✦</span>Customer Lifecycle Management</li>
+        </ul>
+        <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:12px;font-size:.72rem;color:var(--muted2);">www.dsg.co.za</div>
+      </div>
+      <div class="card">
+        <div class="logo-chip" style="padding:8px 14px;"><img src="digitalise-dark.png" alt="Digitalise" style="height:24px;"/></div>
+        <p style="margin-top:14px;font-size:.82rem;font-weight:600;color:var(--primary);">Design &amp; Development Studio</p>
+        <p style="margin-top:10px;font-size:.84rem;color:var(--muted);">Digitalise is DSG's creative and technical engine — transforming business ideas into polished digital products. From strategy through to code, Digitalise builds the platforms and experiences that power modern digital operators.</p>
+        <ul class="ticks" style="margin-top:14px;font-size:.8rem;">
+          <li><span class="chk">✦</span>Web &amp; App Development</li>
+          <li><span class="chk">✦</span>Progressive Web Apps (PWA)</li>
+          <li><span class="chk">✦</span>Digital Transformation Strategy</li>
+          <li><span class="chk">✦</span>UX / UI Design</li>
+          <li><span class="chk">✦</span>Social CRM Integration</li>
+          <li><span class="chk">✦</span>API &amp; Platform Integration</li>
+        </ul>
+        <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:12px;font-size:.72rem;color:var(--muted2);">www.dsg.co.za</div>
+      </div>
+      <div class="card">
+        <div class="logo-chip" style="padding:8px 14px;"><img src="broadbrand-dark.png" alt="BroadBrand" style="height:24px;"/></div>
+        <p style="margin-top:14px;font-size:.82rem;font-weight:600;color:var(--primary);">AI-Driven Mobile Media Marketing</p>
+        <p style="margin-top:10px;font-size:.84rem;color:var(--muted);">BroadBrand combines AI-powered marketing automation with deep mobile expertise to help telecoms brands grow subscriber bases, reduce churn, and maximise customer lifetime value through intelligent, data-led campaigns.</p>
+        <ul class="ticks" style="margin-top:14px;font-size:.8rem;">
+          <li><span class="chk">✦</span>Xanite CVM Platform</li>
+          <li><span class="chk">✦</span>AI Campaign Automation</li>
+          <li><span class="chk">✦</span>SEO / SEM &amp; Paid Media</li>
+          <li><span class="chk">✦</span>Analytics &amp; Reporting</li>
+          <li><span class="chk">✦</span>Subscriber Growth Strategy</li>
+          <li><span class="chk">✦</span>Churn Reduction Programs</li>
+        </ul>
+        <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:12px;font-size:.72rem;color:var(--muted2);">www.dsg.co.za</div>
+      </div>
+      <div class="card">
+        <div style="font-family:var(--sans);font-weight:800;font-size:1.25rem;color:var(--ink);">digitalmall<span class="text-primary">.com</span></div>
+        <p style="margin-top:14px;font-size:.82rem;font-weight:600;color:var(--primary);">Turnkey E-Commerce Platform</p>
+        <p style="margin-top:10px;font-size:.84rem;color:var(--muted);">digitalmall.com enables telecoms operators and enterprises to launch branded online stores quickly and cost-effectively — selling devices, SIMs, bundles, and accessories without the complexity of building custom e-commerce infrastructure.</p>
+        <ul class="ticks" style="margin-top:14px;font-size:.8rem;">
+          <li><span class="chk">✦</span>Branded Online Storefront</li>
+          <li><span class="chk">✦</span>Device &amp; SIM Sales</li>
+          <li><span class="chk">✦</span>Bundle &amp; Top-up Commerce</li>
+          <li><span class="chk">✦</span>Payment Gateway Integration</li>
+          <li><span class="chk">✦</span>Order Management &amp; Fulfilment</li>
+          <li><span class="chk">✦</span>Rapid Deployment — No Dev Required</li>
+        </ul>
+        <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:12px;font-size:.72rem;color:var(--muted2);">www.digitalmall.com</div>
+      </div>
+      <div class="card">
+        <div style="font-family:var(--sans);font-weight:800;font-size:1.2rem;color:var(--ink);">Digital Resilience</div>
+        <p style="margin-top:14px;font-size:.82rem;font-weight:600;color:var(--primary);">Managed Cybersecurity Services</p>
+        <p style="margin-top:10px;font-size:.84rem;color:var(--muted);">Digital Resilience protects businesses and their customers from evolving digital threats — delivering enterprise-grade cybersecurity as a managed service, combined with consumer-facing security products for MVNOs.</p>
+        <ul class="ticks" style="margin-top:14px;font-size:.8rem;">
+          <li><span class="chk">✦</span>Managed Security Services</li>
+          <li><span class="chk">✦</span>Bitdefender Consumer Security</li>
+          <li><span class="chk">✦</span>eInsurer Cyber Insurance</li>
+          <li><span class="chk">✦</span>Identity Theft Protection</li>
+          <li><span class="chk">✦</span>Security Awareness Training</li>
+          <li><span class="chk">✦</span>Incident Response</li>
+        </ul>
+        <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:12px;font-size:.72rem;color:var(--muted2);">www.dsg.co.za</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="Scale & sectors">
+  <div class="slide-inner">
+    <div class="grid g2" style="align-items:start;">
+      <div class="card">
+        <h3 style="font-size:1.5rem;font-weight:700;">Operating at scale</h3>
+        <ul class="ticks" style="margin-top:22px;font-size:.95rem;">
+          <li><span class="chk">✦</span>1,000+ CX seats across Johannesburg and Cape Town</li>
+          <li><span class="chk">✦</span>300+ direct network connections in 200+ countries</li>
+          <li><span class="chk">✦</span>DSTV Internet — 9% of MTN data traffic</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="font-size:1.5rem;font-weight:700;">Sectors served</h3>
+        <p class="muted" style="margin-top:8px;font-size:.9rem;">We work across every vertical that wants a deeper relationship with its mobile customer.</p>
+        <div style="margin-top:20px;display:flex;flex-wrap:wrap;gap:9px;">
+          <span class="tag">Retail &amp; Travel</span>
+          <span class="tag">Financial Services</span>
+          <span class="tag">QSR</span>
+          <span class="tag">FMCG</span>
+          <span class="tag">Media &amp; Entertainment</span>
+          <span class="tag">Telco</span>
+          <span class="tag">IT &amp; Solutions</span>
+          <span class="tag">Agriculture</span>
+          <span class="tag">Education</span>
+          <span class="tag">Telematics</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="How we build MVNOs">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span>Section 03</span>
+    <h2 class="title" style="margin-top:18px;">How we build MVNOs</h2>
+    <div class="rule"></div>
+    <p class="lead" style="margin-top:22px;">Our operating model abstracts the technical and operational complexity of running an MVNO so you can focus on brand, proposition and growth. Five deliverables, sequenced — from commercial viability to launch.</p>
+    <div class="card" style="margin-top:36px;">
+      <h3 style="font-size:1.45rem;font-weight:700;">The three-layer operating model</h3>
+      <p class="muted" style="margin-top:6px;font-size:.9rem;">Each party plays a role they are best placed to play. The MVNE sits in the middle and makes the model work.</p>
+      <div class="grid g3" style="margin-top:24px;">
+        <div class="role-card">
+          <div style="font-size:1.4rem;font-weight:800;">Host MNO <span class="text-primary" style="font-size:.9rem;font-weight:600;">· Econet</span></div>
+          <p style="margin-top:14px;font-size:.88rem;color:var(--muted);">Provides network infrastructure, wholesale billing, SIM procurement, voucher distribution.</p>
+        </div>
+        <div class="role-card hot">
+          <div style="font-size:1.4rem;font-weight:800;" class="text-primary"><span class="text-primary">MVNE — DSG</span></div>
+          <p style="margin-top:14px;font-size:.88rem;color:var(--muted);">Manages technical operations, subscriber management, billing &amp; invoicing, inbound customer care, business support.</p>
+        </div>
+        <div class="role-card">
+          <div style="font-size:1.4rem;font-weight:800;">MVNO — You</div>
+          <p style="margin-top:14px;font-size:.88rem;color:var(--muted);">Owns brand, marketing, sales, distribution, credit relationship and loyalty.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="Five deliverables">
+  <div class="slide-inner">
+    <h3 class="sub">Five deliverables — sequenced</h3>
+    <div class="rule"></div>
+    <p class="muted" style="margin-top:16px;font-size:.95rem;">Every engagement starts with commercial viability and ends with an MVP ready to take to market.</p>
+    <div class="grid" style="margin-top:30px;gap:14px;">
+      <div class="card" style="display:flex;gap:20px;align-items:flex-start;">
+        <span class="num-badge">01</span>
+        <div style="display:flex;gap:18px;align-items:baseline;flex-wrap:wrap;flex:1;">
+          <div style="min-width:120px;"><span class="kicker">BM</span><div style="font-weight:700;font-size:1.05rem;">Business Model</div></div>
+          <p style="flex:1;min-width:280px;font-size:.88rem;color:var(--muted);">Granular 60-month business plan and commercial viability analysis. Acquisition, usage, revenue, cost-to-serve, bad debt, peak funding requirement, monthly cash flow.</p>
+        </div>
+      </div>
+      <div class="card" style="display:flex;gap:20px;align-items:flex-start;">
+        <span class="num-badge">02</span>
+        <div style="display:flex;gap:18px;align-items:baseline;flex-wrap:wrap;flex:1;">
+          <div style="min-width:120px;"><span class="kicker">OM</span><div style="font-weight:700;font-size:1.05rem;">Operating Model</div></div>
+          <p style="flex:1;min-width:280px;font-size:.88rem;color:var(--muted);">High-level technical architecture, relational diagram between parties and draft service levels covering every functional responsibility.</p>
+        </div>
+      </div>
+      <div class="card" style="display:flex;gap:20px;align-items:flex-start;">
+        <span class="num-badge">03</span>
+        <div style="display:flex;gap:18px;align-items:baseline;flex-wrap:wrap;flex:1;">
+          <div style="min-width:120px;"><span class="kicker">GTMP</span><div style="font-weight:700;font-size:1.05rem;">Go-to-Market Plan</div></div>
+          <p style="flex:1;min-width:280px;font-size:.88rem;color:var(--muted);">Sales, distribution, customer care and full subscriber lifecycle management — from acquisition through retention to win-back.</p>
+        </div>
+      </div>
+      <div class="card" style="display:flex;gap:20px;align-items:flex-start;">
+        <span class="num-badge">04</span>
+        <div style="display:flex;gap:18px;align-items:baseline;flex-wrap:wrap;flex:1;">
+          <div style="min-width:120px;"><span class="kicker">ICX</span><div style="font-weight:700;font-size:1.05rem;">Integrated Customer Experience</div></div>
+          <p style="flex:1;min-width:280px;font-size:.88rem;color:var(--muted);">Customer journeys and high-level business processes designed for the channels your customers actually use.</p>
+        </div>
+      </div>
+      <div class="card" style="display:flex;gap:20px;align-items:flex-start;">
+        <span class="num-badge">05</span>
+        <div style="display:flex;gap:18px;align-items:baseline;flex-wrap:wrap;flex:1;">
+          <div style="min-width:120px;"><span class="kicker">MVP</span><div style="font-weight:700;font-size:1.05rem;">Minimum Viable Proposition</div></div>
+          <p style="flex:1;min-width:280px;font-size:.88rem;color:var(--muted);">Packages, deals and specific products &amp; services ready to go to market at launch.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="Light-MVNO accelerator">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span>Light-MVNO accelerator</span>
+    <h3 class="sub" style="margin-top:16px;">Digital Mobile — the light-MVNO platform</h3>
+    <div class="rule"></div>
+    <p class="lead" style="margin-top:22px;">For brands that need to launch in weeks, not months.</p>
+    <div class="grid g2" style="margin-top:34px;">
+      <div class="card" style="display:flex;gap:14px;align-items:flex-start;"><span class="chk" style="font-size:1.1rem;">✦</span><div style="font-size:.98rem;">Pre-integrated VAS: cybersecurity, fintech, OTT, loyalty</div></div>
+      <div class="card" style="display:flex;gap:14px;align-items:flex-start;"><span class="chk" style="font-size:1.1rem;">✦</span><div style="font-size:.98rem;">Dual eSIM with local and global coverage on a single SIM</div></div>
+      <div class="card" style="display:flex;gap:14px;align-items:flex-start;"><span class="chk" style="font-size:1.1rem;">✦</span><div style="font-size:.98rem;">Co-branded and white-label launch ready</div></div>
+      <div class="card" style="display:flex;gap:14px;align-items:flex-start;"><span class="chk" style="font-size:1.1rem;">✦</span><div style="font-size:.98rem;">API-first — minimal capex, no infrastructure to build</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="VAS — where MVNOs win">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span>Section 04</span>
+    <h2 class="title" style="margin-top:18px;">VAS — where MVNOs actually win</h2>
+    <div class="rule"></div>
+    <p class="lead" style="margin-top:22px;">Connectivity gets you to parity. Value-Added Services get you to margin, stickiness and lifetime value. Done well, layered VAS lifts ARPU 20–40% and turns a SIM into a daily-use bundle.</p>
+    <div class="card" style="margin-top:38px;">
+      <div class="eq">
+        <span class="term text-primary">VAS</span>
+        <span class="op">=</span>
+        <span class="term">Revenue</span>
+        <span class="op">+</span>
+        <span class="term">Differentiation</span>
+        <span class="op">+</span>
+        <span class="term">Retention</span>
+      </div>
+      <p class="muted" style="margin-top:18px;font-size:.92rem;">Three outcomes from one strategic lever.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="VAS categories">
+  <div class="slide-inner">
+    <h3 class="sub">Categories that drive profit and loyalty</h3>
+    <div class="rule"></div>
+    <div class="grid g4" style="margin-top:30px;gap:14px;">
+      <div class="card">
+        <span class="num-badge">01</span>
+        <h4 style="margin-top:14px;font-size:.98rem;">Mobile Financial Services</h4>
+        <p style="margin-top:10px;font-size:.82rem;color:var(--muted);">Wallets, nano-loans, insurance, payments. Examples: M-Pesa (Kenya, $900M+ revenue from nano-loans), UPay.</p>
+      </div>
+      <div class="card">
+        <span class="num-badge">02</span>
+        <h4 style="margin-top:14px;font-size:.98rem;">Cybersecurity &amp; Parental Protection</h4>
+        <p style="margin-top:10px;font-size:.82rem;color:var(--muted);">Antivirus, safe browsing, identity protection, VPN, geofencing, app filtering. Exclusive Bitdefender distribution in Africa via Digital Resilience.</p>
+      </div>
+      <div class="card">
+        <span class="num-badge">03</span>
+        <h4 style="margin-top:14px;font-size:.98rem;">Personal Cyber Insurance</h4>
+        <p style="margin-top:10px;font-size:.82rem;color:var(--muted);">Cover for fund theft, ID theft, cyberbullying, ransomware. eInsurer's MEGA / GIGA / TERA tiers map cleanly to MVNO segment bundles.</p>
+      </div>
+      <div class="card">
+        <span class="num-badge">04</span>
+        <h4 style="margin-top:14px;font-size:.98rem;">Entertainment &amp; OTT</h4>
+        <p style="margin-top:10px;font-size:.82rem;color:var(--muted);">Streaming, gaming, content. Jio bundles Disney+, Netflix and JioCinema to lift retention.</p>
+      </div>
+      <div class="card">
+        <span class="num-badge">05</span>
+        <h4 style="margin-top:14px;font-size:.98rem;">eSIM &amp; Roaming</h4>
+        <p style="margin-top:10px;font-size:.82rem;color:var(--muted);">Digital nomad packs, B2B device fleets, IoT. We already run eSIM CX for FNB, Nedbank, MTC and 9 others.</p>
+      </div>
+      <div class="card">
+        <span class="num-badge">06</span>
+        <h4 style="margin-top:14px;font-size:.98rem;">Loyalty &amp; Cashback</h4>
+        <p style="margin-top:10px;font-size:.82rem;color:var(--muted);">Gamified rewards, recharge streaks, points and tiers. Tesco Mobile ties loyalty to top-ups for retail synergy.</p>
+      </div>
+      <div class="card">
+        <span class="num-badge">07</span>
+        <h4 style="margin-top:14px;font-size:.98rem;">Health &amp; Wellness</h4>
+        <p style="margin-top:10px;font-size:.82rem;color:var(--muted);">Telehealth, fitness, mental wellbeing. Verizon-style health platforms bundled with the SIM.</p>
+      </div>
+      <div class="card">
+        <span class="num-badge">08</span>
+        <h4 style="margin-top:14px;font-size:.98rem;">SME Tools</h4>
+        <p style="margin-top:10px;font-size:.82rem;color:var(--muted);">Email, CRM, invoicing, productivity. Connectivity plus the tools an SME actually runs on.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="Platforms we bring">
+  <div class="slide-inner">
+    <h3 class="sub">Platforms we bring to the table</h3>
+    <div class="rule"></div>
+    <div class="grid g2" style="margin-top:30px;">
+      <div class="card">
+        <div style="display:flex;align-items:baseline;gap:12px;"><h4 style="font-size:1.15rem;">Xanite</h4><span class="kicker">CVM platform</span></div>
+        <p style="margin-top:12px;font-size:.88rem;color:var(--muted);">Real-time segmentation, predictive modelling, CDR-driven triggers, gamified loyalty, multi-channel execution across WhatsApp, SMS, USSD and SFMC. Modular rollout in days, not quarters.</p>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:baseline;gap:12px;"><h4 style="font-size:1.15rem;">Bitdefender Safe Family</h4><span class="kicker">Cybersecurity</span></div>
+        <p style="margin-top:12px;font-size:.88rem;color:var(--muted);">Parental controls, app filtering, time-of-day limits, geofencing. Multi-Access Security Suite across Windows, Android, iOS and Chromebook. Exclusive Africa distribution.</p>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:baseline;gap:12px;"><h4 style="font-size:1.15rem;">eInsurer</h4><span class="kicker">Personal cyber insurance</span></div>
+        <p style="margin-top:12px;font-size:.88rem;color:var(--muted);">Tiered cover for digital-life risks — fund theft, ID theft, cyberbullying, ransomware, trauma counselling. Embedded onboarding via the self-care app.</p>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:baseline;gap:12px;"><h4 style="font-size:1.15rem;">Sentiance</h4><span class="kicker">Mobility &amp; lifestyle insights</span></div>
+        <p style="margin-top:12px;font-size:.88rem;color:var(--muted);">On-device AI for driver profiling, crash detection, mobility patterns and 64 lifestyle segments. Unlocks insurance, family-safety and green-mobility VAS.</p>
+      </div>
+    </div>
+    <div class="card" style="margin-top:24px;display:flex;flex-wrap:wrap;align-items:center;gap:28px;">
+      <div class="big-num" style="font-size:clamp(2.4rem,6vw,4.2rem);">20–40%</div>
+      <div style="flex:1;min-width:280px;">
+        <p style="font-size:1rem;">ARPU lift achievable through layered VAS — measured against connectivity-only baselines.</p>
+        <p style="margin-top:8px;font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2);">MVNO operator benchmarks</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-slide="Econet — the host network">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span>Section 05 · For Econet Wireless Zimbabwe</span>
+    <h2 class="title" style="margin-top:18px;max-width:20ch;">Econet Wireless Zimbabwe — the foundation every MVNO is built on.</h2>
+    <div class="rule"></div>
+    <p class="lead" style="margin-top:24px;">Every MVNO we launch in Zimbabwe rides Econet's network. Econet provides the wholesale layer it already owns; DSG brings the brands, the platform and the day-to-day operations. The result is a new, high-margin revenue line on infrastructure that is already built — with the operational burden carried by us, not Econet.</p>
+    <div class="grid g3" style="margin-top:44px;">
+      <div class="role-card hot">
+        <div style="font-size:1.4rem;font-weight:800;" class="text-primary">Econet</div>
+        <p style="margin-top:12px;font-size:.86rem;color:var(--muted);">The host MNO. Provides the network and the wholesale relationship.</p>
+      </div>
+      <div class="role-card">
+        <div style="font-size:1.4rem;font-weight:800;">DSG — MVNE</div>
+        <p style="margin-top:12px;font-size:.86rem;color:var(--muted);">Runs the platform, billing, care, VAS and every MVNO on the network.</p>
+      </div>
+      <div class="role-card">
+        <div style="font-size:1.4rem;font-weight:800;">The brands</div>
+        <p style="margin-top:12px;font-size:.86rem;color:var(--muted);">Retail, banking, faith, diaspora, agri, enterprise — each its own MVNO.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="What Econet manages">
+  <div class="slide-inner">
+    <h3 class="sub">What Econet manages as the host MNO</h3>
+    <div class="rule"></div>
+    <p class="muted" style="margin-top:16px;max-width:74ch;font-size:.95rem;">Eight wholesale responsibilities — all within Econet's existing core competency. This is the network layer Econet already runs every day; the MVNO simply rides on top of it.</p>
+    <div class="grid g4" style="margin-top:28px;gap:14px;">
+      <div class="card">
+        <span class="num-badge">01</span>
+        <h4 style="margin-top:12px;font-size:.95rem;">Radio access &amp; coverage</h4>
+        <p style="margin-top:9px;font-size:.8rem;color:var(--muted);">National 2G / 3G / 4G LTE (and 5G where live) coverage. The MVNO rides Econet's RAN; capacity is allocated to MVNO traffic.</p>
+      </div>
+      <div class="card">
+        <span class="num-badge">02</span>
+        <h4 style="margin-top:12px;font-size:.95rem;">Core network &amp; provisioning</h4>
+        <p style="margin-top:9px;font-size:.8rem;color:var(--muted);">HLR / HSS subscriber provisioning, IMSI activation and enablement of voice, SMS and data bearers on the core.</p>
+      </div>
+      <div class="card">
+        <span class="num-badge">03</span>
+        <h4 style="margin-top:12px;font-size:.95rem;">Numbering &amp; SIM / eSIM identity</h4>
+        <p style="margin-top:9px;font-size:.8rem;color:var(--muted);">MSISDN ranges and IMSI allocation for the MVNO. SIM and eSIM profiles issued on Econet IMSIs.</p>
+      </div>
+      <div class="card">
+        <span class="num-badge">04</span>
+        <h4 style="margin-top:12px;font-size:.95rem;">Wholesale rate card &amp; billing</h4>
+        <p style="margin-top:9px;font-size:.8rem;color:var(--muted);">Wholesale tariffs for voice, SMS and data. CDR feeds to the MVNE and monthly reconciliation &amp; settlement.</p>
+      </div>
+      <div class="card">
+        <span class="num-badge">05</span>
+        <h4 style="margin-top:12px;font-size:.95rem;">Interconnect &amp; roaming</h4>
+        <p style="margin-top:9px;font-size:.8rem;color:var(--muted);">National interconnect with other Zimbabwe operators, plus international roaming and IDD for MVNO subscribers.</p>
+      </div>
+      <div class="card">
+        <span class="num-badge">06</span>
+        <h4 style="margin-top:12px;font-size:.95rem;">Regulatory &amp; compliance interface</h4>
+        <p style="margin-top:9px;font-size:.8rem;color:var(--muted);">POTRAZ licensing alignment, SIM registration, lawful intercept and number-portability obligations.</p>
+      </div>
+      <div class="card">
+        <span class="num-badge">07</span>
+        <h4 style="margin-top:12px;font-size:.95rem;">Quality of service &amp; SLAs</h4>
+        <p style="margin-top:9px;font-size:.8rem;color:var(--muted);">Network availability, throughput and an agreed service-level commitment to the MVNO tier.</p>
+      </div>
+      <div class="card">
+        <span class="num-badge">08</span>
+        <h4 style="margin-top:12px;font-size:.95rem;">Capacity planning</h4>
+        <p style="margin-top:9px;font-size:.8rem;color:var(--muted);">Forecasting and dimensioning incremental MVNO load so it never degrades Econet's own subscriber base.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="A light lift for Econet">
+  <div class="slide-inner">
+    <h3 class="sub">Econet provides the network. DSG carries everything else.</h3>
+    <div class="rule"></div>
+    <p class="muted" style="margin-top:16px;max-width:74ch;font-size:.95rem;">The whole point of an MVNE is that the host MNO does <em>not</em> take on retail operations. Econet stays focused on the network; DSG runs every customer-facing and back-office function for each MVNO.</p>
+    <div class="grid g2" style="margin-top:30px;align-items:start;">
+      <div class="card hot">
+        <div class="kicker">Econet — host MNO</div>
+        <h4 style="margin-top:8px;font-size:1.15rem;">The wholesale network layer</h4>
+        <ul class="ticks" style="margin-top:16px;font-size:.86rem;">
+          <li><span class="chk">✦</span>Radio access, core network &amp; coverage</li>
+          <li><span class="chk">✦</span>Subscriber provisioning &amp; numbering</li>
+          <li><span class="chk">✦</span>Wholesale rate card &amp; CDR settlement</li>
+          <li><span class="chk">✦</span>Interconnect, roaming &amp; QoS</li>
+          <li><span class="chk">✦</span>Regulatory &amp; lawful-intercept interface</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="kicker">DSG — MVNE</div>
+        <h4 style="margin-top:8px;font-size:1.15rem;">Everything retail-facing &amp; back-office</h4>
+        <ul class="ticks" style="margin-top:16px;font-size:.86rem;">
+          <li><span class="chk">✦</span>BSS / OCS — rating, charging, invoicing</li>
+          <li><span class="chk">✦</span>Subscriber lifecycle &amp; self-care app</li>
+          <li><span class="chk">✦</span>Inbound customer care — 1,000+ CX seats</li>
+          <li><span class="chk">✦</span>VAS, loyalty &amp; marketing (Xanite CVM)</li>
+          <li><span class="chk">✦</span>Revenue assurance &amp; MVNO onboarding</li>
+        </ul>
+      </div>
+    </div>
+    <p class="muted" style="margin-top:24px;font-size:.9rem;">Net effect for Econet: <strong style="color:var(--ink);">a new wholesale revenue line with minimal incremental cost, effort or risk</strong> — and no dilution of the Econet retail brand.</p>
+  </div>
+</section>
+
+<section class="slide" data-slide="The opportunity for Econet">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span>The upside</span>
+    <h3 class="sub" style="margin-top:16px;">The opportunity for Econet</h3>
+    <div class="rule"></div>
+    <p class="muted" style="margin-top:16px;max-width:74ch;font-size:.95rem;">An MVNO programme turns Econet's network into a wholesale platform — capturing revenue and segments the retail brand can't reach on its own.</p>
+    <div class="grid g3" style="margin-top:28px;gap:14px;">
+      <div class="card">
+        <span class="num-badge">01</span>
+        <h4 style="margin-top:12px;font-size:.98rem;">Incremental wholesale revenue</h4>
+        <p style="margin-top:9px;font-size:.82rem;color:var(--muted);">A high-margin annuity per active SIM and per unit of usage — earned on infrastructure that is already built and largely paid for. Near-zero incremental capex.</p>
+      </div>
+      <div class="card">
+        <span class="num-badge">02</span>
+        <h4 style="margin-top:12px;font-size:.98rem;">Reach without brand dilution</h4>
+        <p style="margin-top:9px;font-size:.82rem;color:var(--muted);">Address niche, affinity and segment markets — retail, faith, youth, diaspora, enterprise — under partner brands, with no cannibalisation of the Econet retail proposition.</p>
+      </div>
+      <div class="card">
+        <span class="num-badge">03</span>
+        <h4 style="margin-top:12px;font-size:.98rem;">Defend &amp; grow market share</h4>
+        <p style="margin-top:9px;font-size:.82rem;color:var(--muted);">MVNOs fill the low-end and niche gaps that competitors would otherwise take. Every brand on Econet's network is share that does not move to NetOne or Telecel.</p>
+      </div>
+      <div class="card">
+        <span class="num-badge">04</span>
+        <h4 style="margin-top:12px;font-size:.98rem;">Guaranteed minimum commitments</h4>
+        <p style="margin-top:9px;font-size:.82rem;color:var(--muted);">Wholesale floors and take-or-pay terms underwrite a predictable baseline of revenue, de-risking the arrangement for Econet from day one.</p>
+      </div>
+      <div class="card">
+        <span class="num-badge">05</span>
+        <h4 style="margin-top:12px;font-size:.98rem;">VAS &amp; ecosystem revenue</h4>
+        <p style="margin-top:9px;font-size:.82rem;color:var(--muted);">Fintech, security, insurance, OTT and IoT traffic all flow across Econet's network — with the option to share in the VAS economics DSG brings to each MVNO.</p>
+      </div>
+      <div class="card">
+        <span class="num-badge">06</span>
+        <h4 style="margin-top:12px;font-size:.98rem;">Higher network utilisation</h4>
+        <p style="margin-top:9px;font-size:.82rem;color:var(--muted);">More subscribers per site and better use of off-peak capacity lift the return on the network Econet has already invested in.</p>
+      </div>
+      <div class="card">
+        <span class="num-badge">07</span>
+        <h4 style="margin-top:12px;font-size:.98rem;">Innovation at zero risk</h4>
+        <p style="margin-top:9px;font-size:.82rem;color:var(--muted);">Partner brands experiment with new propositions and segments. Econet keeps the wholesale annuity regardless of which brand wins.</p>
+      </div>
+      <div class="card">
+        <span class="num-badge">08</span>
+        <h4 style="margin-top:12px;font-size:.98rem;">A wholesale platform play</h4>
+        <p style="margin-top:9px;font-size:.82rem;color:var(--muted);">Econet becomes more than a retail operator — it becomes the wholesale platform for Zimbabwe's digital brands, the model leading MNOs use globally to grow.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="The Zimbabwe opportunity">
+  <div class="slide-inner">
+    <h3 class="sub">Why Zimbabwe — and why now</h3>
+    <div class="rule"></div>
+    <div class="grid g2" style="margin-top:28px;align-items:start;">
+      <div>
+        <ul class="ticks" style="font-size:.95rem;gap:16px;">
+          <li><span class="chk">✦</span><span><strong style="color:var(--ink);">The leading network.</strong> Econet has the widest coverage and the largest subscriber base in Zimbabwe — the ideal host for a portfolio of MVNOs.</span></li>
+          <li><span class="chk">✦</span><span><strong style="color:var(--ink);">A mobile-first economy.</strong> High mobile penetration and a population that already lives on data and mobile money — the daily-use behaviour MVNOs monetise.</span></li>
+          <li><span class="chk">✦</span><span><strong style="color:var(--ink);">EcoCash rails.</strong> A trusted, ubiquitous mobile-money platform to bundle into fintech-led MVNO propositions and airtime-as-cashback.</span></li>
+          <li><span class="chk">✦</span><span><strong style="color:var(--ink);">A large diaspora.</strong> Millions of Zimbabweans abroad — strong demand for diaspora &amp; travel eSIM, remittance-linked bundles and stay-in-touch plans.</span></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 style="font-size:1.05rem;">Verticals ready for an MVNO in Zimbabwe</h4>
+        <div style="margin-top:18px;display:flex;flex-wrap:wrap;gap:9px;">
+          <span class="tag">Retail &amp; FMCG</span>
+          <span class="tag">Banking &amp; Fintech</span>
+          <span class="tag">Faith &amp; Community</span>
+          <span class="tag">Diaspora &amp; Travel</span>
+          <span class="tag">Agribusiness &amp; Tobacco</span>
+          <span class="tag">Youth &amp; Social</span>
+          <span class="tag">Media &amp; Entertainment</span>
+          <span class="tag">Mining &amp; Enterprise</span>
+          <span class="tag">SME &amp; Productivity</span>
+          <span class="tag">IoT &amp; Telematics</span>
+        </div>
+        <p class="muted" style="margin-top:20px;font-size:.82rem;">Each is a brand that already owns a customer relationship — and each becomes wholesale traffic on Econet's network.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-slide="How Econet earns">
+  <div class="slide-inner">
+    <h3 class="sub">How the model works — and how Econet earns</h3>
+    <div class="rule"></div>
+    <p class="muted" style="margin-top:16px;max-width:74ch;font-size:.95rem;">A clean three-party flow. The subscriber deals with the brand; DSG runs the operation; Econet earns a wholesale annuity on every SIM and every byte.</p>
+    <div class="grid g3" style="margin-top:30px;gap:0;border:1px solid var(--border);border-radius:18px;overflow:hidden;">
+      <div style="padding:24px;background:rgba(255,255,255,.03);border-right:1px solid var(--border);">
+        <div class="kicker">Layer 1</div>
+        <h4 style="margin-top:8px;font-size:1.1rem;">MVNO brand</h4>
+        <p style="margin-top:10px;font-size:.82rem;color:var(--muted);">Owns the customer, sets retail pricing, runs marketing &amp; distribution. Collects subscriber revenue.</p>
+      </div>
+      <div style="padding:24px;background:var(--primary-soft);border-right:1px solid var(--border);">
+        <div class="kicker">Layer 2</div>
+        <h4 style="margin-top:8px;font-size:1.1rem;" class="text-primary">DSG — MVNE</h4>
+        <p style="margin-top:10px;font-size:.82rem;color:var(--muted);">Runs BSS/OCS, care, VAS and billing. Charges the MVNO a managed-service fee; settles wholesale with Econet.</p>
+      </div>
+      <div style="padding:24px;background:rgba(255,255,255,.03);">
+        <div class="kicker">Layer 3</div>
+        <h4 style="margin-top:8px;font-size:1.1rem;">Econet — host MNO</h4>
+        <p style="margin-top:10px;font-size:.82rem;color:var(--muted);">Provides wholesale network. Earns per-SIM access + per-unit usage, plus agreed minimum commitments.</p>
+      </div>
+    </div>
+    <div class="grid g3" style="margin-top:24px;gap:14px;">
+      <div class="card"><div class="stat-num" style="font-size:1.2rem;">Per-SIM access</div><p style="margin-top:8px;font-size:.82rem;color:var(--muted);">A recurring wholesale charge for every active subscriber on the network.</p></div>
+      <div class="card"><div class="stat-num" style="font-size:1.2rem;">Usage wholesale</div><p style="margin-top:8px;font-size:.82rem;color:var(--muted);">Voice, SMS and data billed at the wholesale rate card as subscribers consume.</p></div>
+      <div class="card"><div class="stat-num" style="font-size:1.2rem;">Minimum commitments</div><p style="margin-top:8px;font-size:.82rem;color:var(--muted);">Take-or-pay floors underwrite a predictable baseline regardless of ramp.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="hero closing" data-slide="Get in touch">
+  <div class="slide-inner">
+    <span class="eyebrow"><span class="dot"></span>Get in touch</span>
+    <h2 class="title" style="margin-top:18px;max-width:18ch;">Let's build Zimbabwe's MVNO market — on Econet's network.</h2>
+    <div class="rule"></div>
+    <p class="lead" style="margin-top:24px;">Econet brings the network. DSG brings the brands, the platform and the operations. Tell us the appetite and we'll come back with a viability view, a wholesale model and a phased plan.</p>
+    <div class="grid g2" style="margin-top:42px;max-width:760px;">
+      <div class="card">
+        <div class="kicker">Lead</div>
+        <h4 style="margin-top:8px;font-size:1.15rem;">Edward Wicks</h4>
+        <p style="margin-top:8px;font-size:.9rem;color:var(--muted);"><a href="mailto:edwardw@mvne.co.za">edwardw@mvne.co.za</a><br/>mvne.co.za</p>
+      </div>
+      <div class="card">
+        <div class="kicker">Lead</div>
+        <h4 style="margin-top:8px;font-size:1.15rem;">Jason Alexander</h4>
+        <p style="margin-top:8px;font-size:.9rem;color:var(--muted);"><a href="mailto:Jasona@mvne.co.za">Jasona@mvne.co.za</a><br/>mvne.co.za</p>
+      </div>
+    </div>
+    <p style="margin-top:30px;font-size:.95rem;color:var(--muted);">Email us · <strong style="color:var(--ink);">+27 11 759 7000</strong></p>
+    <div style="margin-top:48px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+      <div class="logo-chip"><img src="dsg-dark.png" alt="DSG"/><span class="divider"></span><img src="mvne-dark.png" alt="MVNE"/></div>
+      <footer class="deck-foot">© 2026 DSG. All rights reserved. · dsg.co.za · mvne.co.za</footer>
+    </div>
+  </div>
+</section>
+
+<script>
+ if (window.lucide) { lucide.createIcons(); }
+</script>
+<script>
+ const slides = document.querySelectorAll('[data-slide]');
+ const sideNav = document.getElementById('sideNav');
+ slides.forEach((s, i) => {
+ const a = document.createElement('a');
+ a.href = '#s' + i; a.title = s.dataset.slide; s.id = 's' + i;
+ sideNav.appendChild(a);
+ });
+ const dots = sideNav.querySelectorAll('a');
+ const progress = document.getElementById('progress');
+ let currentSlide = 0, presenting = false;
+
+ function onScroll() {
+ if (presenting) return;
+ const h = document.documentElement;
+ progress.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100 + '%';
+ let active = 0;
+ slides.forEach((s, i) => { if (s.getBoundingClientRect().top <= window.innerHeight * 0.4) active = i; });
+ currentSlide = active;
+ dots.forEach((d, i) => d.classList.toggle('active', i === active));
+ }
+ window.addEventListener('scroll', onScroll, { passive: true });
+ onScroll();
+
+ function goToSlide(index) {
+ index = Math.max(0, Math.min(slides.length - 1, index));
+ slides[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
+ currentSlide = index;
+ }
+
+ const controls = document.getElementById('presentControls');
+ const counter = document.getElementById('presentCounter');
+ const presentToggle = document.getElementById('presentToggle');
+ let controlsTimer;
+ function flashControls() {
+ if (!presenting) return;
+ controls.classList.add('show');
+ clearTimeout(controlsTimer);
+ controlsTimer = setTimeout(() => controls.classList.remove('show'), 2600);
+ }
+ function showPresentSlide(index) {
+ currentSlide = Math.max(0, Math.min(slides.length - 1, index));
+ slides.forEach((s, i) => s.classList.toggle('is-current', i === currentSlide));
+ counter.textContent = (currentSlide + 1) + ' / ' + slides.length;
+ dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+ const cur = slides[currentSlide]; if (cur) cur.scrollTop = 0;
+ flashControls();
+ }
+ function enterPresent() {
+ presenting = true;
+ document.body.classList.add('present');
+ showPresentSlide(currentSlide);
+ const el = document.documentElement;
+ if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+ else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+ }
+ function exitPresent() {
+ if (!presenting) return;
+ presenting = false;
+ document.body.classList.remove('present');
+ slides.forEach(s => s.classList.remove('is-current'));
+ controls.classList.remove('show');
+ if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+ else if (document.webkitFullscreenElement && document.webkitExitFullscreen) document.webkitExitFullscreen();
+ slides[currentSlide].scrollIntoView({ block: 'start' });
+ onScroll();
+ }
+ function togglePresent() { presenting ? exitPresent() : enterPresent(); }
+
+ presentToggle.addEventListener('click', enterPresent);
+ document.getElementById('nextBtn').addEventListener('click', () => showPresentSlide(currentSlide + 1));
+ document.getElementById('prevBtn').addEventListener('click', () => showPresentSlide(currentSlide - 1));
+ document.getElementById('exitBtn').addEventListener('click', exitPresent);
+
+ function onFsChange() {
+ if (window.__diagramFsActive) return;
+ if (presenting && !document.fullscreenElement && !document.webkitFullscreenElement) exitPresent();
+ }
+ document.addEventListener('fullscreenchange', onFsChange);
+ document.addEventListener('webkitfullscreenchange', onFsChange);
+ document.addEventListener('mousemove', () => { if (presenting) flashControls(); });
+
+ document.addEventListener('keydown', (e) => {
+ if (e.target.matches('input, textarea, select')) return;
+ const next = ['ArrowRight', 'ArrowDown', 'PageDown', ' '];
+ const prev = ['ArrowLeft', 'ArrowUp', 'PageUp'];
+ if (e.key === 'f' || e.key === 'F') { e.preventDefault(); togglePresent(); return; }
+ if (e.key === 'Escape') { if (presenting) exitPresent(); return; }
+ const step = (d) => presenting ? showPresentSlide(currentSlide + d) : goToSlide(currentSlide + d);
+ if (next.includes(e.key)) { e.preventDefault(); step(1); }
+ else if (prev.includes(e.key)) { e.preventDefault(); step(-1); }
+ else if (e.key === 'Home') { e.preventDefault(); presenting ? showPresentSlide(0) : goToSlide(0); }
+ else if (e.key === 'End') { e.preventDefault(); presenting ? showPresentSlide(slides.length - 1) : goToSlide(slides.length - 1); }
+ });
+ dots.forEach((dot, i) => dot.addEventListener('click', (e) => { e.preventDefault(); presenting ? showPresentSlide(i) : goToSlide(i); }));
+
+ const hint = document.getElementById('navHint');
+ setTimeout(() => hint.classList.add('visible'), 500);
+ setTimeout(() => hint.classList.remove('visible'), 5000);
+ let hintTimer;
+ document.addEventListener('mousemove', (e) => {
+ if (presenting) return;
+ if (e.clientY > window.innerHeight - 120 && e.clientX < 260) {
+ hint.classList.add('visible');
+ clearTimeout(hintTimer);
+ hintTimer = setTimeout(() => hint.classList.remove('visible'), 2500);
+ }
+ });
+</script>
+</body>
+</html>
